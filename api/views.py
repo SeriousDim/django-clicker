@@ -6,33 +6,38 @@ from rest_framework.response import Response
 
 from api.models import Note
 from backend.forms import UserForm
+from .serializers import NoteSerializer
+from rest_framework import viewsets
 
 
 class NoteView(APIView):
     def get(self, request):
-        id = request.query_params.get("id")  # Получение id из параметров запроса
+        id = request.query_params.get("id")
         if id:
-            note = Note.objects.get(pk=id)  # Получаем заметку
-            return Response({
-                "id": note.id,
-                "title": note.title,
-                "text": note.text
-            })
-        # Если в запросе нет параметра id, возвращаем все заметки
-        notes = Note.objects.all()
+            note = Note.objects.get(pk=id)  # Получаем заметку из базы по primary key
+            serializer = NoteSerializer(note)  # Засовываем заметку в сериализатор, преобразуем данные
+            return Response(serializer.data)  # serializer.data вернет красивый json на фронт
 
-        return Response(notes.values())
+        notes = Note.objects.all()  # Получаем все заметки из базы данных
+
+        # Засовываем полученные данные в сериалайзер, чтобы
+        # он автоматически превратил все данные в красивый json формат
+        # и ставим аргумент many=True, чтобы он достал множество заметок, а не одну
+        serializer = NoteSerializer(notes, many=True)
+
+        return Response(serializer.data)  # serializer.data вернет красивый json на фронт
 
     def post(self, request):
-        title = request.data.get('title')
-        text = request.data.get('text')
-        note = Note.objects.create(title=title, text=text)
+        serializer = NoteSerializer(data=request.data)  # request.data - это данные, которые прилетают в запросе
 
-        return Response({
-            "id": note.id,
-            "title": note.title,
-            "text": note.text
-        })
+        # Функция позволяет проверить, валидны ли данные
+        if serializer.is_valid():
+            note = serializer.save()  # Сохраняем в базу данных. С помощью сериализаторов это тоже можно делать
+            note_serialized = NoteSerializer(
+                note)  # Т.к. из базы возвращается объект, сериализуем его, чтобы вернуть на фронт
+            return Response(note_serialized.data)
+
+        return Response('Ah, shit. Here we go again')
 
     def put(self, request):
         id = request.data.get('id')  # Получение id из тела запроса
@@ -85,3 +90,9 @@ class Register(APIView):
             return redirect('index')
 
         return render(request, 'register.html', {'form': form})
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+
