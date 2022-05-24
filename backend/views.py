@@ -2,10 +2,16 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from backend.forms import UserForm
+from backend.models import Core, Boost
+from backend.serializers import CoreSerializer, BoostSerializer
 
-
+"""
 def index(request):
     return HttpResponse("Здесь будет Майк Вазовски")
 
@@ -36,8 +42,85 @@ def user_login(request):
         return render(request, 'login.html', {'form': form, 'invalid': True})
 
     return render(request, 'login.html', {'form': form})
+"""
+
+
+class Register(APIView):
+    def get(self, request):
+        form = UserForm()
+        return render(request, 'register.html', {'form': form})
+
+    def post(self, request):
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+
+            core = Core(user=user)  # Создаем экземпляр класса Core и пихаем в него модель юзера
+            core.save()  # Сохраняем изменения в базу
+            return redirect('index')
+
+        return render(request, 'register.html', {'form': form})
+
+
+class Login(APIView):
+    form = UserForm()
+
+    def get(self, request):
+        return render(request, 'login.html', {'form': self.form})
+
+    def post(self, request):
+        user = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
+        if user:
+            login(request, user)
+            return redirect('index')
+        return render(request, 'login.html', {'form': self.form, 'invalid': True})
+
+@api_view(['GET'])
+@login_required
+def call_click(request):
+    core = Core.objects.get(user=request.user)
+    is_levelup = core.click()  # Труе если буст создался
+    if is_levelup:
+        Boost.objects.create(core=core, price=core.level * 50, power=core.level * 20)  # Создание буста
+    core.save()
+
+    return Response({'core': CoreSerializer(core).data, 'is_levelup': is_levelup})
+
+@api_view(['GET'])
+@login_required
+def buy_boost(request, id):
+    core = Core.objects.get(user=request.user)
+    boost = Boost.objects.get(id=id)
+    if core.coins > 0:
+        core.click_power += boost.power
+        core.coins -= boost.price
+        core.save()
+        return Response({'coins': core.coins})
+    return Response("Not enough money", status=400)
+
+@login_required
+def index(request):
+    core = Core.objects.get(user=request.user)  # Получаем объект игры текущего пользователя
+    boosts = Boost.objects.filter(core=core).all()
+
+    return render(request, 'index.html', {
+        'core': core,
+        'boosts': boosts
+    })
 
 @login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+
+class BoostViewSet(ModelViewSet):
+    queryset = Boost.objects.all()
+    serializer_class = BoostSerializer
+
+    # Переопределение метода get_queryset для получения бустов, привязанных к определенному ядру
+    def get_queryset(self):
+        core = Core.objects.get(user=self.request.user)  # Получение ядра пользователя
+        boosts = Boost.objects.filter(core=core)  # Получение бустов ядра
+        return boosts
