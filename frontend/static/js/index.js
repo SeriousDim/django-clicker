@@ -5,12 +5,12 @@ function call_click() {
         if (response.ok) {
             return response.json()
         }
-        if (response.is_levelup) {
-            get_boosts()
-        }
         return Promise.reject(response)
     }).then(data => {
         document.getElementById('coins').innerText = data.core.coins
+        if (data.is_levelup) {
+            get_boosts()
+        }
     }).catch(error => console.log(error))
 }
 
