@@ -19,5 +19,7 @@ urlpatterns = [
     path('boosts/', boosts, name="boosts"),
     path('logout/', views.user_logout, name='logout'),
     path('buy_boost/<int:id>', views.buy_boost, name="buy_boost"),
-    path('boost/<int:pk>/', lonely_boost, name="boost")
+    path('boost/<int:pk>/', lonely_boost, name="boost"),
+    path('update_coins/', views.update_coins),
+    path('core/', views.get_core)
 ]
