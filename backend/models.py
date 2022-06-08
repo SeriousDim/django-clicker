@@ -54,7 +54,7 @@ class Core(models.Model):
 
     # Поменяли название с check_level_price, потому что теперь так гораздо больше подходит по смыслу.
     def calculate_next_level_price(self):
-        return (self.level ** 3) * 10
+        return self.level**2 * 127
 
 
 class Boost(models.Model):
@@ -80,7 +80,7 @@ class Boost(models.Model):
 
         self.level += 1
         self.power *= 2
-        self.price *= self.price * BOOST_TYPE_VALUES[self.type]['price_scale']  # Умножаем ценник на константу.
+        self.price = self.price * BOOST_TYPE_VALUES[self.type]['price_scale']  # Умножаем ценник на константу.
         self.save()
 
         return old_boost_values, self

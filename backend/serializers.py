@@ -13,7 +13,7 @@ class CoreSerializer(ModelSerializer):
     class Meta:
         model = Core
         fields = ['coins', 'click_power', 'auto_click_power',
-                  'next_level_price']  # Не возвращаем пользователя потому что а зачем
+                  'next_level_price', 'level']  # Не возвращаем пользователя потому что а зачем
 
 
 class BoostSerializer(ModelSerializer):
