@@ -77,6 +77,9 @@ nav {
     height: calc(100% - 2em);
 
     grid-area: 1 / 2 / 3 / 3;
+
+    overflow: auto;
+    scrollbar-width: thin;
 }
 
 #core_logout a {
@@ -118,6 +121,18 @@ nav > div {
     left: 30%;
 }
 
+#notif {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    width: 28%;
+    height: 30em;
+    overflow: hidden;
+
+    margin: 1.5em;
+}
+
 #kakashi:active {
     cursor: grabbing;
 }
@@ -144,4 +159,63 @@ aside {
 
 #coins {
     color: #BEA53C;
+}
+
+.centered {
+    width: 60%;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-content: center;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 1em;
+
+    padding: 2em 1em;
+}
+
+.centered h1 {
+    text-align: center;
+}
+
+.centered a {
+    color: red;
+}
+
+.centered input {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 1em;
+
+    padding: 0.3em;
+    color: white;
+}
+
+.centered input[type=submit] {
+    width: 40%;
+    color: white;
+
+    padding: 0.5em;
+    font-size: 1.2em;
+
+    margin: 0 auto;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 1em;
+
+    border: none;
+    cursor: pointer;
+}
+
+.centered form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.5em;
+}
+
+.centered p {
+    margin: 0.2em;
 }

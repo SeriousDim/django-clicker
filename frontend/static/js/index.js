@@ -50,6 +50,8 @@ function call_click() {
     const kakashiNode = document.getElementById('kakashi')
     click_animation(kakashiNode, 50)
     Game.add_coins(Game.click_power)
+
+    //addNotification("Нажато!", "red")
 }
 
 /** Функция для обновления количества монет, невероятной мощи и дружинных кликуш в HTML-элементах. */
@@ -128,6 +130,7 @@ function updateCoins(current_coins) {
         return Promise.reject(response)
     }).then(response => {
         if (response.is_levelup) {
+            addNotification("Поздравляем! У вас новый уровень! И новый буст!", "lime")
             get_boosts()
         }
         return response.core
@@ -168,7 +171,10 @@ function buy_boost(boost_id) {
         if (response.ok) return response.json()
         return Promise.reject(response)
     }).then(response => {
-        if (response.error) return
+        if (response.error) {
+            addNotification("Недостаточно денег!", "orange")
+            return
+        }
         const old_boost_stats = response.old_boost_stats
         const new_boost_stats = response.new_boost_stats
 
@@ -179,6 +185,7 @@ function buy_boost(boost_id) {
             Game.add_power(old_boost_stats.power)
         }
         update_boost(new_boost_stats) // Обновляем буст на фронтике.
+        addNotification("Вы купили буст!", "yellow")
     }).catch(err => console.log(err))
 }
 
@@ -227,4 +234,11 @@ window.onload = function () {
     Game.init() // Инициализация игры.
     setAutoClick() // Инициализация автоклика.
     setAutoSave() // Инициализация автосейва.
+}
+
+function addNotification(text, color) {
+    let panel = document.getElementById("notif")
+    panel.innerHTML += `<br><span style='color:${color}'>☛ ${text}</span>`
+
+    panel.scrollTop = panel.scrollHeight;
 }
