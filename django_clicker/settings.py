@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i$31-!sbj_$mlhuosj$6y$!aq*of_ae$(!x3208ts6$kx3n_81
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
 
 
 # Application definition
@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'django_clicker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db/db.sqlite3',
     }
 }
 

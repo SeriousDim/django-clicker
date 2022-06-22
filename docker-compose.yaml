@@ -1,0 +1,16 @@
+version: "3.9"
+
+volumes:
+  sqlite:
+
+services:
+  tyan-clicker:
+    build: .
+    container_name: tyan
+    restart: always
+    environment:
+      TZ: Asia/Yekaterinburg
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite:/db
